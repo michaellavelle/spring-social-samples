@@ -1,0 +1,4 @@
+insert into UserConnection (userid, accessToken, displayName,providerId,providerUserId) values ('habuma', 'freebirds', 'Craig Walls','springSocialSecurity','habuma');
+insert into UserConnection (userid, accessToken, displayName,providerId,providerUserId) values ('kdonald', 'melbourne', 'Keith Donald','springSocialSecurity','kdonald');
+insert into UserConnection (userid, accessToken, displayName,providerId,providerUserId) values ('rclarkson', 'atlanta', 'Roy Clarkson','springSocialSecurity','rclarkson');
+

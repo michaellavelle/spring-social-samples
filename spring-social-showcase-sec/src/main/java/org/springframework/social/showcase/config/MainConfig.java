@@ -31,7 +31,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
-import org.springframework.social.showcase.account.JdbcAccountRepository;
+import org.springframework.social.showcase.signin.SigninController;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -75,8 +75,7 @@ public class MainConfig {
 	private DatabasePopulator databasePopulator() {
 		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 		populator.addScript(new ClassPathResource("JdbcUsersConnectionRepository.sql", JdbcUsersConnectionRepository.class));
-		populator.addScript(new ClassPathResource("Account.sql", JdbcAccountRepository.class));
-		populator.addScript(new ClassPathResource("data.sql", JdbcAccountRepository.class));
+		populator.addScript(new ClassPathResource("data.sql", SigninController.class));
 		return populator;
 	}
 }

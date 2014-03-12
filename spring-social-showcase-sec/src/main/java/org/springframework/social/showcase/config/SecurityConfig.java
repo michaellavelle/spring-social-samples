@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -42,17 +41,14 @@ import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 import org.springframework.social.security.SocialAuthenticationProvider;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
-import org.springframework.social.showcase.security.SimpleSocialUsersDetailService;
-
+  
 /**
  * Security Configuration.
  * @author Craig Walls
@@ -107,8 +103,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-			
-		http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/signin"));
+		
+		boolean allowFormLoginAsWellAsSocialLogin = true;
+		
+		// Form login can be optionally provided which allows admin users to login and
+		// would allow social users the opportunity to login with username/password
+		// in the even they disconnected from all social providers
+		if (allowFormLoginAsWellAsSocialLogin)
+		{
+			http.formLogin()
+			.loginPage("/signin")
+			.loginProcessingUrl("/signin/authenticate")
+			.failureUrl("/signin?param.error=bad_credentials");
+		}
+		else
+		{
+			http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/signin"));
+		}
 		
 		http
 		.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
@@ -130,11 +141,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.and()
 				.apply(new SpringSocialConfigurer());
 	}
-	
-	//@Bean
-	//public SocialUserDetailsService socialUsersDetailService() {
-		//return new SimpleSocialUsersDetailService(userDetailsService());
-	//}
 	
 	@Bean
 	public UserIdSource userIdSource() {

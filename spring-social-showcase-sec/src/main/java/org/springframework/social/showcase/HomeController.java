@@ -24,7 +24,6 @@ import org.socialsignin.springsocial.security.api.SpringSocialSecurity;
 import org.socialsignin.springsocial.security.api.SpringSocialSecurityProfile;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
-import org.springframework.social.showcase.account.AccountRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,14 +32,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
 	
 	private final Provider<ConnectionRepository> connectionRepositoryProvider;
-	
-	private final AccountRepository accountRepository;
-	
+		
 
 	@Inject
-	public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, AccountRepository accountRepository) {
+	public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider) {
 		this.connectionRepositoryProvider = connectionRepositoryProvider;
-		this.accountRepository = accountRepository;
 	}
 
 	@RequestMapping("/")

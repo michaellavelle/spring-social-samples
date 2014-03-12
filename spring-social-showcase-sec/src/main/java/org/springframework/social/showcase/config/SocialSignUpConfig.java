@@ -13,7 +13,7 @@ import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 
 @Configuration
 @ComponentScan({"org.socialsignin.springsocial.security.signup"})
-public class SignUpConfig {
+public class SocialSignUpConfig {
 
 	@Inject
 	private JdbcUsersConnectionRepository usersConnectionRepository;
@@ -24,6 +24,11 @@ public class SignUpConfig {
 	@PostConstruct
 	public void registerConnectionSignUp()
 	{
+		// Optionally register implicit sign up - allows an account to be
+		// created in the event that sufficient details can be obtained
+		// from social provider.  Otherwise the user will be taken to an
+		// explicit sign up form.
+		// Can be removed if implicit sign up is not required
 		usersConnectionRepository.setConnectionSignUp(connectionSignUp);
 	}
 }

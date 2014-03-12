@@ -91,6 +91,9 @@ public class SocialConfig extends SocialConfigurerAdapter {
 		cfConfig.addConnectionFactory(new LinkedInConnectionFactory(env
 				.getProperty("linkedin.consumerKey"), env
 				.getProperty("linkedin.consumerSecret")));
+		
+		// We are using the UsersConnectionRepository to store local user details
+		// as ConnectionData for the SpringSocialSecurity pseudo provider.
 		cfConfig.addConnectionFactory(new SpringSocialSecurityConnectionFactory());
 
 	}
@@ -126,6 +129,10 @@ public class SocialConfig extends SocialConfigurerAdapter {
 			ConnectionRepository connectionRepository) {
 		ConnectController connectController = new ConnectController(
 				connectionFactoryLocator, connectionRepository);
+		
+		// Add connect interceptors for all our providers to prevent multiple users
+		// sharing the same 3rd party provider account and also to maintain assigned
+		// security roles appropriately on connection
 		connectController
 				.addInterceptor(springSocialSecurityTwitterConnectInterceptor());
 		connectController
@@ -139,16 +146,22 @@ public class SocialConfig extends SocialConfigurerAdapter {
 		return connectController;
 	}
 
+	/** Create a SpringSocialSecurityConnectInterceptor for Twitter.  This prevents multiple users connecting to
+	 * the same Twitter account and also updates the users assigned security roles when connecting with Twitter*/
 	@Bean
 	public ConnectInterceptor<Twitter> springSocialSecurityTwitterConnectInterceptor() {
 		return new SpringSocialSecurityTwitterConnectInterceptor();
 	}
 
+	/** Create a SpringSocialSecurityConnectInterceptor for Facebook.  This prevents multiple users connecting to
+	 * the same Facebook account and also updates the users assigned security roles when connecting with Facebook*/
 	@Bean
 	public ConnectInterceptor<Facebook> springSocialSecurityFacebookConnectInterceptor() {
 		return new SpringSocialSecurityFacebookConnectInterceptor();
 	}
 
+	/** Create a SpringSocialSecurityConnectInterceptor for LinkedIn.  This prevents multiple users connecting to
+	 * the same LinkedIn account and also updates the users assigned security roles when connecting with LinkedIn*/
 	@Bean
 	public ConnectInterceptor<LinkedIn> springSocialSecurityLinkedInConnectInterceptor() {
 		return new SpringSocialSecurityLinkedInConnectInterceptor();
@@ -197,19 +210,5 @@ public class SocialConfig extends SocialConfigurerAdapter {
 		return connection != null ? connection.getApi() : null;
 	}
 
-	@Bean
-	public SignUpService<?> signUpService() {
-		return new ConnectionRepositorySignUpService();
-	}
-
-	@Bean
-	public SpringSocialSecuritySignInService signInService() {
-		return new SpringSocialSecuritySignInService();
-	}
-
-	@Bean
-	public SpringSocialSecurityAuthenticationFactory authenticationFactory() {
-		return new SpringSocialSecurityAuthenticationFactory();
-	}
 
 }
