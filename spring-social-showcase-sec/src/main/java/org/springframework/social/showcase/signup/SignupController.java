@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.WebRequest;
 
-@Controller
+//@Controller
 public class SignupController {
 
 	private final AccountRepository accountRepository;

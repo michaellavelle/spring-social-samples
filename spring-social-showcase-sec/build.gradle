@@ -34,6 +34,7 @@ dependencies {
 	compile "org.springframework.social:spring-social-config:$springSocialVersion"
 	compile "org.springframework.social:spring-social-core:$springSocialVersion"
 	compile "org.springframework.social:spring-social-web:$springSocialVersion"
+	compile "org.socialsignin:spring-social-security:$socialsigninSpringSocialSecurityVersion"
 	compile "org.springframework.social:spring-social-security:$springSocialVersion"
 	compile "org.springframework.social:spring-social-facebook:$springSocialFacebookVersion"
 	compile "org.springframework.social:spring-social-facebook-web:$springSocialFacebookVersion"
@@ -61,6 +62,7 @@ repositories {
 	maven { url 'http://maven.springframework.org/release' }
 	maven { url 'http://maven.springframework.org/milestone' }
 	maven { url 'http://maven.springframework.org/snapshot' }
+	maven { url 'http://repo.opensourceagility.com/snapshots' }
 	maven { url 'http://download.java.net/maven/2' }
 	mavenCentral()
 }

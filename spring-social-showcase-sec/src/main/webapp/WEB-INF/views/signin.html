@@ -50,13 +50,31 @@
 			</form>
 
 			<!-- TWITTER SIGNIN -->
-			<p><a th:href="@{/auth/twitter}"><img th:src="@{/resources/social/twitter/sign-in-with-twitter-d.png}" border="0"/></a></p>
-		
+			<p>
+			<form id="signin_twitter" action="signin/twitter" method="post"> 
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
+			
+			<input type="submit" value="" style="background:url(resources/social/twitter/sign-in-with-twitter-d.png) no-repeat; width: 150px; "  />
+			</form>
+			</p>
 			<!-- FACEBOOK SIGNIN -->
-			<p><a th:href="@{/auth/facebook}"><img th:src="@{/resources/social/facebook/sign-in-with-facebook.png}" border="0"/></a></p>
+		 
+		 	<p>
+		 	<form id="signin_facebook" action="signin/facebook" method="post"> 
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
+			
+			<input type="submit" value="" style="background:url(resources/social/facebook/sign-in-with-facebook.png) no-repeat; width: 150px; "  />
+			</form>
+			</p>
 		 
 			<!-- LINKEDIN SIGNIN -->
-			<p><a th:href="@{/auth/linkedin}">Sign In with LinkedIn</a></p>
+		 	<p>
+		 	<form id="signin_linkedin" action="signin/linkedin" method="post"> 
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
+			
+			<input type="submit" value="Sign In With LinkedIn"  />
+			</form>
+			</p>
 		</div>		
 	</body>
 </html>

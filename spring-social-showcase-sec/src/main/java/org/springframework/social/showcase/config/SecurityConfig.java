@@ -15,23 +15,40 @@
  */
 package org.springframework.social.showcase.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
+import org.socialsignin.springsocial.security.signin.SpringSocialSecurityAccessDeniedHandler;
+import org.socialsignin.springsocial.security.signin.SpringSocialSecurityAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.social.UserIdSource;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
+import org.springframework.social.security.SocialAuthenticationProvider;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 import org.springframework.social.showcase.security.SimpleSocialUsersDetailService;
@@ -51,12 +68,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	private DataSource dataSource;
 	
 	@Autowired
+	@Qualifier(value="springSocialSecurityUserDetailsService")
+	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private SpringSocialSecurityAuthenticationFilter springSocialSecurityAuthenticationFilter;
+	
+	@Autowired
+	private SpringSocialSecurityAccessDeniedHandler accessDeniedHandler;
+
+	
+	@Autowired
 	public void registerAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-		auth.jdbcAuthentication()
-				.dataSource(dataSource)
-				.usersByUsernameQuery("select username, password, true from Account where username = ?")
-				.authoritiesByUsernameQuery("select username, 'ROLE_USER' from Account where username = ?")
-				.passwordEncoder(passwordEncoder());
+		auth.userDetailsService(userDetailsService);
 	}
 	
 	@Override
@@ -66,19 +90,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/resources/**");
 	}
 	
+	@Bean
+	public SocialAuthenticationProvider socialAuthenticationProvider(UsersConnectionRepository usersConnectionRepository,SocialUserDetailsService socialUserDetailsService)
+	{
+		return new SocialAuthenticationProvider(usersConnectionRepository,socialUserDetailsService);
+	}
+	
+	@Bean
+	public AuthenticationManager authenticationManager(UsersConnectionRepository usersConnectionRepository,SocialUserDetailsService socialUserDetailsService)
+	{
+		List<AuthenticationProvider> authProviders = new ArrayList<AuthenticationProvider>();
+		authProviders.add(socialAuthenticationProvider(usersConnectionRepository,socialUserDetailsService));
+		return new ProviderManager(authProviders);
+	}
+	
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+			
+		http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/signin"));
+		
 		http
-			.formLogin()
-				.loginPage("/signin")
-				.loginProcessingUrl("/signin/authenticate")
-				.failureUrl("/signin?param.error=bad_credentials")
-			.and()
+		.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+
+		http.addFilterAfter(springSocialSecurityAuthenticationFilter,AbstractPreAuthenticatedProcessingFilter.class);
+			http
 				.logout()
 					.logoutUrl("/signout")
 					.deleteCookies("JSESSIONID")
 			.and()
 				.authorizeRequests()
+				.antMatchers("/twitter/**").hasRole("USER_TWITTER")
+				.antMatchers("/facebook/**").hasRole("USER_FACEBOOK")
+				.antMatchers("/linkedin/**").hasRole("USER_LINKEDIN")
 					.antMatchers("/admin/**", "/favicon.ico", "/resources/**", "/auth/**", "/signin/**", "/signup/**", "/disconnect/facebook").permitAll()
 					.antMatchers("/**").authenticated()
 			.and()
@@ -87,10 +131,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.apply(new SpringSocialConfigurer());
 	}
 	
-	@Bean
-	public SocialUserDetailsService socialUsersDetailService() {
-		return new SimpleSocialUsersDetailService(userDetailsService());
-	}
+	//@Bean
+	//public SocialUserDetailsService socialUsersDetailService() {
+		//return new SimpleSocialUsersDetailService(userDetailsService());
+	//}
 	
 	@Bean
 	public UserIdSource userIdSource() {

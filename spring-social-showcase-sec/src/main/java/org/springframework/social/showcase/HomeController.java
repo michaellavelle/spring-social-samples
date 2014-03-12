@@ -20,6 +20,9 @@ import java.security.Principal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.socialsignin.springsocial.security.api.SpringSocialSecurity;
+import org.socialsignin.springsocial.security.api.SpringSocialSecurityProfile;
+import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.showcase.account.AccountRepository;
 import org.springframework.stereotype.Controller;
@@ -32,6 +35,7 @@ public class HomeController {
 	private final Provider<ConnectionRepository> connectionRepositoryProvider;
 	
 	private final AccountRepository accountRepository;
+	
 
 	@Inject
 	public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, AccountRepository accountRepository) {
@@ -41,8 +45,11 @@ public class HomeController {
 
 	@RequestMapping("/")
 	public String home(Principal currentUser, Model model) {
+		
+		Connection<SpringSocialSecurity> springSocialSecurity = connectionRepositoryProvider.get().getPrimaryConnection(SpringSocialSecurity.class);
+		SpringSocialSecurityProfile account = springSocialSecurity.getApi().getUserProfile();
 		model.addAttribute("connectionsToProviders", getConnectionRepository().findAllConnections());
-		model.addAttribute(accountRepository.findAccountByUsername(currentUser.getName()));
+		model.addAttribute("account",account);
 		return "home";
 	}
 	

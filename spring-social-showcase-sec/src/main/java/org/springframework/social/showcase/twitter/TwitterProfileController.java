@@ -19,6 +19,7 @@ import java.security.Principal;
 
 import javax.inject.Inject;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.twitter.api.Twitter;

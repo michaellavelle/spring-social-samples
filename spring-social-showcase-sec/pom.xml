@@ -32,6 +32,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+            <groupId>org.socialsignin</groupId>
+            <artifactId>spring-social-security</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+    	</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${org.springframework-version}</version>
@@ -221,6 +226,10 @@
 			<url>http://repo.springsource.org/milestone</url>
 			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
+		 <repository>
+    		<id>opensourceagility-snapshots</id>
+   			 <url>http://repo.opensourceagility.com/snapshots</url>
+  		 </repository>
 	</repositories>
 	<build>
 		<resources>

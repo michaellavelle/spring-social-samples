@@ -30,7 +30,10 @@
 				<span th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
 					You are not yet connected to <span th:text="#{${providerId} + '.displayName'}">provider name</span>.
 				</span>
+				<span th:if="${providerId != 'springSocialSecurity'}">
 				Click <a th:href="@{'/connect/' + ${providerId}}">here</a> to manage your <span th:text="#{${providerId} + '.displayName'}">provider name</span> connection.
+				</span>
+				
 				</p>
  			</div>
 		</div>

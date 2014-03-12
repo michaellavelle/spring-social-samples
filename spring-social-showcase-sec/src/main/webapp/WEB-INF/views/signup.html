@@ -25,25 +25,22 @@
 				 th:class="${message.type.cssClass}" 
 				 th:text="${message.text}">error message text</div>
 			
-			<form id="signup" th:action="@{/signup}" method="post" th:object="${signupForm}">
+			<form id="signup" th:action="@{/signup}" method="post" th:object="${signUpForm}">
 				<input type="hidden" name="_csrf" th:value="${_csrf.token}" />
 				<div class="formInfo">
 					<div class="error" th:if="${#fields.hasErrors('*')}">Unable to sign up. Please fix the errors below and resubmit.</div>
 				</div>
 				
 				<fieldset>
-					<label for="firstName">First Name <span th:if="${#fields.hasErrors('firstName')}" class="error" th:text="${#fields.errors('firstName')[0]}">Error</span></label>
-					<input type="text" th:field="*{firstName}" />
-					<label for="lastName">Last Name <span th:if="${#fields.hasErrors('lastName')}" class="error" th:text="${#fields.errors('lastName')[0]}">Error</span></label>
-					<input type="text" th:field="*{lastName}" />
-					<label for="username">Username <span th:if="${#fields.hasErrors('username')}" class="error" th:text="${#fields.errors('username')[0]}">Error</span></label>
-					<input type="text" th:field="*{username}" />
-					<label for="password">Password (at least 6 characters) <span th:if="${#fields.hasErrors('password')}" class="error" th:text="${#fields.errors('password')[0]}">Error</span></label>
-					<input type="password" th:field="*{password}" />
+					<label for="displayName">Display Name <span th:if="${#fields.hasErrors('displayName')}" class="error" th:text="${#fields.errors('displayName')[0]}">Error</span></label>
+					<input type="text" th:field="*{displayName}" />
+					<label for="userName">Username <span th:if="${#fields.hasErrors('userName')}" class="error" th:text="${#fields.errors('userName')[0]}">Error</span></label>
+					<input type="text" th:field="*{userName}" />
 				</fieldset>
 				<p><button type="submit">Sign Up</button></p>
 			</form>
 		</div>
 	</body>
 </html>
+
 
