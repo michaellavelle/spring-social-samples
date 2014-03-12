@@ -35,7 +35,7 @@ public class TweetAfterConnectInterceptor implements ConnectInterceptor<Twitter>
 	public void postConnect(Connection<Twitter> connection, WebRequest request) {
 		if (request.getAttribute(POST_TWEET_ATTRIBUTE, WebRequest.SCOPE_SESSION) != null) {
 			try {
-				connection.updateStatus("I've connected with the Spring Social Showcase!");
+				connection.updateStatus("I've connected with the SocialSignin Spring Social Showcase! - https://github.com/michaellavelle/spring-social-samples/tree/socialsignin-spring-social-security/spring-social-showcase-sec #springsocial");
 			} catch (DuplicateStatusException e) {
 			}
 			request.removeAttribute(POST_TWEET_ATTRIBUTE, WebRequest.SCOPE_SESSION);
