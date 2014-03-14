@@ -23,6 +23,7 @@ import org.socialsignin.springsocial.security.signin.SpringSocialSecurityAuthent
 import org.socialsignin.springsocial.security.signin.SpringSocialSecuritySignInService;
 import org.socialsignin.springsocial.security.signup.ConnectionRepositorySignUpService;
 import org.socialsignin.springsocial.security.signup.SignUpService;
+import org.socialsignin.springsocial.security.web.CustomCallbackUrlConnectController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -52,8 +53,11 @@ import org.springframework.social.linkedin.connect.LinkedInConnectionFactory;
 import org.springframework.social.showcase.facebook.PostToWallAfterConnectInterceptor;
 import org.springframework.social.showcase.facebook.SpringSocialSecurityFacebookConnectInterceptor;
 import org.springframework.social.showcase.linkedin.SpringSocialSecurityLinkedInConnectInterceptor;
+import org.springframework.social.showcase.soundcloud.SpringSocialSecuritySoundCloudConnectInterceptor;
 import org.springframework.social.showcase.twitter.SpringSocialSecurityTwitterConnectInterceptor;
 import org.springframework.social.showcase.twitter.TweetAfterConnectInterceptor;
+import org.springframework.social.soundcloud.api.SoundCloud;
+import org.springframework.social.soundcloud.connect.SoundCloudConnectionFactory;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 
@@ -68,7 +72,8 @@ import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 @ComponentScan({ "org.socialsignin.springsocial.security.signin",
 		"org.socialsignin.springsocial.security.userdetails",
 		"org.socialsignin.springsocial.security.userauthorities",
-		"org.socialsignin.springsocial.security.userauthorities" })
+		"org.socialsignin.springsocial.security.userauthorities",
+		"org.socialsignin.springsocial.security.web"})
 public class SocialConfig extends SocialConfigurerAdapter {
 
 	@Inject
@@ -91,6 +96,11 @@ public class SocialConfig extends SocialConfigurerAdapter {
 		cfConfig.addConnectionFactory(new LinkedInConnectionFactory(env
 				.getProperty("linkedin.consumerKey"), env
 				.getProperty("linkedin.consumerSecret")));
+		
+		cfConfig.addConnectionFactory(new SoundCloudConnectionFactory(env
+				.getProperty("soundcloud.consumerKey"), env
+				.getProperty("soundcloud.consumerSecret"),env
+				.getProperty("soundcloud.redirectUri")));
 		
 		// We are using the UsersConnectionRepository to store local user details
 		// as ConnectionData for the SpringSocialSecurity pseudo provider.
@@ -127,8 +137,20 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	public ConnectController connectController(
 			ConnectionFactoryLocator connectionFactoryLocator,
 			ConnectionRepository connectionRepository) {
-		ConnectController connectController = new ConnectController(
+		
+		// Register a CustomCallbackUrlConnectController here instead of a regular ConnectController to
+		// support the use case where we require a callback url other than "/connect" for a given provider.
+		
+		// In this case we require the controller to support soundcloud callbacks which must be
+		// a single url per application.  We use the ProviderSignInOrConnectController from spring-social-security
+		// to support a single callback of "/signinOrConnect" which we register for SoundCloud.
+		
+		// The main ConnectController hard codes the callback to be "/connect" so we must
+		// override this value for SoundCloud via this custom controller
+		CustomCallbackUrlConnectController connectController = new CustomCallbackUrlConnectController(
 				connectionFactoryLocator, connectionRepository);
+		connectController.setOverriddenConnectCallbackBasePath("soundcloud", "/signinOrConnect");
+		
 		
 		// Add connect interceptors for all our providers to prevent multiple users
 		// sharing the same 3rd party provider account and also to maintain assigned
@@ -139,7 +161,10 @@ public class SocialConfig extends SocialConfigurerAdapter {
 				.addInterceptor(springSocialSecurityFacebookConnectInterceptor());
 		connectController
 				.addInterceptor(springSocialSecurityLinkedInConnectInterceptor());
-
+		connectController
+				.addInterceptor(springSocialSecuritySoundCloudConnectInterceptor());
+		
+		
 		connectController
 				.addInterceptor(new PostToWallAfterConnectInterceptor());
 		connectController.addInterceptor(new TweetAfterConnectInterceptor());
@@ -165,6 +190,13 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	@Bean
 	public ConnectInterceptor<LinkedIn> springSocialSecurityLinkedInConnectInterceptor() {
 		return new SpringSocialSecurityLinkedInConnectInterceptor();
+	}
+	
+	/** Create a SpringSocialSecurityConnectInterceptor for LinkedIn.  This prevents multiple users connecting to
+	 * the same LinkedIn account and also updates the users assigned security roles when connecting with LinkedIn*/
+	@Bean
+	public ConnectInterceptor<SoundCloud> springSocialSecuritySoundCloudConnectInterceptor() {
+		return new SpringSocialSecuritySoundCloudConnectInterceptor();
 	}
 
 	@Bean
@@ -207,6 +239,14 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	public LinkedIn linkedin(ConnectionRepository repository) {
 		Connection<LinkedIn> connection = repository
 				.findPrimaryConnection(LinkedIn.class);
+		return connection != null ? connection.getApi() : null;
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
+	public SoundCloud soundcloud(ConnectionRepository repository) {
+		Connection<SoundCloud> connection = repository
+				.findPrimaryConnection(SoundCloud.class);
 		return connection != null ? connection.getApi() : null;
 	}
 

@@ -134,7 +134,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/twitter/**").hasRole("USER_TWITTER")
 				.antMatchers("/facebook/**").hasRole("USER_FACEBOOK")
 				.antMatchers("/linkedin/**").hasRole("USER_LINKEDIN")
-					.antMatchers("/admin/**", "/favicon.ico", "/resources/**", "/auth/**", "/signin/**", "/signup/**", "/disconnect/facebook").permitAll()
+				.antMatchers("/soundcloud/**").hasRole("USER_SOUNDCLOUD")
+
+					.antMatchers("/admin/**", "/favicon.ico", "/resources/**", "/auth/**", "/signin/**","/signinOrConnect/**", "/signup/**", "/disconnect/facebook").permitAll()
 					.antMatchers("/**").authenticated()
 			.and()
 				.rememberMe()

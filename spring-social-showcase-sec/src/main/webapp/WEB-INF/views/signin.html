@@ -75,6 +75,15 @@
 			<input type="submit" value="Sign In With LinkedIn"  />
 			</form>
 			</p>
+			
+			<!-- SOUNDCLOUD SIGNIN -->
+		 	<p>
+		 	<form id="signin_soundcloud" action="signin/soundcloud" method="post"> 
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
+			
+			<input type="submit" value="Sign In With SoundCloud"  />
+			</form>
+			</p>
 		</div>		
 	</body>
 </html>
