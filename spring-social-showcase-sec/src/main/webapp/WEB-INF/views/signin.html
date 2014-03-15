@@ -84,6 +84,15 @@
 			<input type="submit" value="Sign In With SoundCloud"  />
 			</form>
 			</p>
+			
+			<!-- LASTFM SIGNIN -->
+		 	<p>
+		 	<form id="signin_soundcloud" action="signin/lastfm" method="post"> 
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
+			
+			<input type="submit" value="Sign In With LastFm"  />
+			</form>
+			</p>
 		</div>		
 	</body>
 </html>

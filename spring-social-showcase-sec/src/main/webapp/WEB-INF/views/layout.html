@@ -52,6 +52,14 @@
 				<li><a th:href="@{/soundcloud/following}">Following</a></li>
 			</ul>
 			</div>
+			
+			<h4><a th:href="@{/lastfm}">LastFm</a></h4>
+			<div social:connected="lastfm">
+			<ul class="menu">
+				<li><a th:href="@{/lastfm}">User Profile</a></li>
+				<li><a th:href="@{/lastfm/friends}">Friends</a></li>
+			</ul>
+			</div>
 		</div>
 		
 		<div id="content" layout:fragment="content">

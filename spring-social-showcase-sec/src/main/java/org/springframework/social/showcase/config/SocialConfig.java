@@ -19,10 +19,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import org.socialsignin.springsocial.security.connect.SpringSocialSecurityConnectionFactory;
-import org.socialsignin.springsocial.security.signin.SpringSocialSecurityAuthenticationFactory;
 import org.socialsignin.springsocial.security.signin.SpringSocialSecuritySignInService;
-import org.socialsignin.springsocial.security.signup.ConnectionRepositorySignUpService;
-import org.socialsignin.springsocial.security.signup.SignUpService;
 import org.socialsignin.springsocial.security.web.CustomCallbackUrlConnectController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,10 +45,13 @@ import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.facebook.web.DisconnectController;
+import org.springframework.social.lastfm.api.LastFm;
+import org.springframework.social.lastfm.pseudooauth2.connect.LastFmPseudoOAuth2ConnectionFactory;
 import org.springframework.social.linkedin.api.LinkedIn;
 import org.springframework.social.linkedin.connect.LinkedInConnectionFactory;
 import org.springframework.social.showcase.facebook.PostToWallAfterConnectInterceptor;
 import org.springframework.social.showcase.facebook.SpringSocialSecurityFacebookConnectInterceptor;
+import org.springframework.social.showcase.lastfm.SpringSocialSecurityLastFmConnectInterceptor;
 import org.springframework.social.showcase.linkedin.SpringSocialSecurityLinkedInConnectInterceptor;
 import org.springframework.social.showcase.soundcloud.SpringSocialSecuritySoundCloudConnectInterceptor;
 import org.springframework.social.showcase.twitter.SpringSocialSecurityTwitterConnectInterceptor;
@@ -101,6 +101,10 @@ public class SocialConfig extends SocialConfigurerAdapter {
 				.getProperty("soundcloud.consumerKey"), env
 				.getProperty("soundcloud.consumerSecret"),env
 				.getProperty("soundcloud.redirectUri")));
+		
+		cfConfig.addConnectionFactory(new LastFmPseudoOAuth2ConnectionFactory(env
+				.getProperty("lastfm.consumerKey"), env
+				.getProperty("lastfm.consumerSecret")));
 		
 		// We are using the UsersConnectionRepository to store local user details
 		// as ConnectionData for the SpringSocialSecurity pseudo provider.
@@ -163,7 +167,8 @@ public class SocialConfig extends SocialConfigurerAdapter {
 				.addInterceptor(springSocialSecurityLinkedInConnectInterceptor());
 		connectController
 				.addInterceptor(springSocialSecuritySoundCloudConnectInterceptor());
-		
+		connectController
+		.addInterceptor(springSocialSecurityLastFmConnectInterceptor());
 		
 		connectController
 				.addInterceptor(new PostToWallAfterConnectInterceptor());
@@ -192,11 +197,18 @@ public class SocialConfig extends SocialConfigurerAdapter {
 		return new SpringSocialSecurityLinkedInConnectInterceptor();
 	}
 	
-	/** Create a SpringSocialSecurityConnectInterceptor for LinkedIn.  This prevents multiple users connecting to
-	 * the same LinkedIn account and also updates the users assigned security roles when connecting with LinkedIn*/
+	/** Create a SpringSocialSecurityConnectInterceptor for SoundCloud.  This prevents multiple users connecting to
+	 * the same SoundCloud account and also updates the users assigned security roles when connecting with SoundCloud*/
 	@Bean
 	public ConnectInterceptor<SoundCloud> springSocialSecuritySoundCloudConnectInterceptor() {
 		return new SpringSocialSecuritySoundCloudConnectInterceptor();
+	}
+	
+	/** Create a SpringSocialSecurityConnectInterceptor for LastFm.  This prevents multiple users connecting to
+	 * the same LastFm account and also updates the users assigned security roles when connecting with LastFm*/
+	@Bean
+	public ConnectInterceptor<LastFm> springSocialSecurityLastFmConnectInterceptor() {
+		return new SpringSocialSecurityLastFmConnectInterceptor();
 	}
 
 	@Bean
@@ -247,6 +259,14 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	public SoundCloud soundcloud(ConnectionRepository repository) {
 		Connection<SoundCloud> connection = repository
 				.findPrimaryConnection(SoundCloud.class);
+		return connection != null ? connection.getApi() : null;
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
+	public LastFm lastFm(ConnectionRepository repository) {
+		Connection<LastFm> connection = repository
+				.findPrimaryConnection(LastFm.class);
 		return connection != null ? connection.getApi() : null;
 	}
 

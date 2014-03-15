@@ -42,6 +42,8 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
@@ -100,6 +102,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		return new ProviderManager(authProviders);
 	}
 	
+	@Bean
+	public RequestCache requestCache()
+	{
+		return new HttpSessionRequestCache();
+	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -121,6 +128,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/signin"));
 		}
 		
+		http.requestCache().requestCache(requestCache());
+		
 		http
 		.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
 
@@ -135,6 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/facebook/**").hasRole("USER_FACEBOOK")
 				.antMatchers("/linkedin/**").hasRole("USER_LINKEDIN")
 				.antMatchers("/soundcloud/**").hasRole("USER_SOUNDCLOUD")
+				.antMatchers("/lastfm/**").hasRole("USER_LASTFM")
 
 					.antMatchers("/admin/**", "/favicon.ico", "/resources/**", "/auth/**", "/signin/**","/signinOrConnect/**", "/signup/**", "/disconnect/facebook").permitAll()
 					.antMatchers("/**").authenticated()

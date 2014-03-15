@@ -18,7 +18,6 @@ package org.springframework.social.showcase.soundcloud;
 import javax.inject.Inject;
 
 import org.springframework.social.soundcloud.api.SoundCloud;
-import org.springframework.social.twitter.api.Twitter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

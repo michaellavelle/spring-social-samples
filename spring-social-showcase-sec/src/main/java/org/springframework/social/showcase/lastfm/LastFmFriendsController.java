@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.social.showcase.twitter;
-
-import java.security.Principal;
+package org.springframework.social.showcase.lastfm;
 
 import javax.inject.Inject;
 
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionRepository;
-import org.springframework.social.twitter.api.Twitter;
+import org.springframework.social.lastfm.api.LastFm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-public class TwitterProfileController {
+public class LastFmFriendsController {
 
-	@Inject
-	private ConnectionRepository connectionRepository;
+	private final LastFm lastFm;
 	
-	@RequestMapping(value="/twitter", method=RequestMethod.GET)
-	public String home(Principal currentUser, Model model) {
-		Connection<Twitter> connection = connectionRepository.findPrimaryConnection(Twitter.class);
-		if (connection == null) {
-			return "redirect:/connect/twitter";
-		}
-		model.addAttribute("profile", connection.getApi().userOperations().getUserProfile());
-		return "twitter/profile";
+	@Inject
+	public LastFmFriendsController(LastFm lastFm) {
+		this.lastFm = lastFm;
 	}
 	
+	@RequestMapping(value="/lastfm/friends", method=RequestMethod.GET)
+	public String friends(Model model) {
+		String lastFmUserName = lastFm.userOperations().getUserProfile().getName();
+		model.addAttribute("profiles", lastFm.userOperations().getFriends(lastFmUserName));;
+		return "lastfm/friends";
+	}
+
+	
+
 }

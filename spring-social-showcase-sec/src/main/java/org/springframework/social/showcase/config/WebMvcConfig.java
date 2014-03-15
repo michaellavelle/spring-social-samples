@@ -44,6 +44,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/resources/**").addResourceLocations(
 				"/resources/");
 	}
+	
+	
+	
 
 	@Bean
 	public MessageSource messageSource() {
